@@ -8,7 +8,7 @@ export const authenticationState = {
 
 export const authenticationReducer = (state = authenticationState, action) => {
     const {type, payload} = action;
-
+    // debugger;
     switch(action.type){
         case LOGIN.INVOKE:
             return { ...state, loginError: null };

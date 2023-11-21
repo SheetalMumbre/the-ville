@@ -20,7 +20,7 @@ const LoginForm = () => {
 
     const handleSubmit = useCallback(values => {
         dispatch(login(values));
-        // alert('Login successful');
+         alert('Login successful');
 
         // console.log('Form submitted with email value:', values.email);
         // console.log('Password value:', values.password);
