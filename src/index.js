@@ -7,15 +7,23 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from './theme';
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { Provider } from 'react-redux';
+import { configureStore } from './store/store';
+import { createBrowserHistory } from 'history';
+
+const history = createBrowserHistory();
+const store = configureStore(history);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
+      {/* <ThemeProvider> */}
          <App />
-      </ThemeProvider>
+      {/* </ThemeProvider> */}
     </BrowserRouter>
+    </Provider>
   </React.StrictMode>
 );
 

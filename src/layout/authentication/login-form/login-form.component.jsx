@@ -1,34 +1,33 @@
 import { Grid, TextField } from "@mui/material";
 import { Field, Form, Formik } from "formik";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { LoginButton } from "./login-form.styles";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../logic/authentication.action";
 
 const LoginForm = () => {
-    // debugger;
+    const dispatch = useDispatch();
 
     // const [values, setValues]= useState({
         
-    // });
+    // }); 
 
     const form = useMemo(() =>({
         email:'',
         password:''
     }), []);
 
-    const handleSubmit = (values) => {
+    const handleSubmit = useCallback(values => {
+        dispatch(login(values));
         // alert('Login successful');
 
-        console.log('Form submitted with email value:', values.email);
-        console.log('Password value:', values.password);
-        window.alert(values.email + values.password);
-        window.location.href = '/';
-        // try{    
-        // }
-        // catch(error){
-        //     alert('There is some Error');
-        // }
-    };
+        // console.log('Form submitted with email value:', values.email);
+        // console.log('Password value:', values.password);
+        // window.alert(values.email + values.password);
+        // window.location.href = '/';
+        
+    }, [dispatch]);
     return(
         <div>
             <Formik initialValues={form} onSubmit={handleSubmit}>
