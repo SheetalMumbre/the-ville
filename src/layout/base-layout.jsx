@@ -1,27 +1,21 @@
-import styled from "styled-components";
+import React from 'react';
+import styled from '@emotion/styled';
 
-export const BaseLayout =  ({children}) => {
-    return(
-        <FullPageLayout>
-            {/* Page Layout */}
-            {children}
-        </FullPageLayout>
-    );
+export const BaseLayout = ({ moduleError, children }) => {
+  return (
+    <FullPageLayout>
+      {moduleError && <div>{moduleError}</div>}
+
+      {!moduleError && children}
+    </FullPageLayout>
+  );
 }
 
 const FullPageLayout = styled.div`
-  background:#e0f0f0;
+  background-color: ${(props) => props.theme.palette.background.default};
+  //padding-top: 10px;
   height: 100vh;
   overflow-x: hidden;
-
-    ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #c8c8c8; 
-    border-radius: 5px;
-  }
 
   .open-sidebar {
     animation: slide-in 0.8s forwards;
@@ -54,4 +48,4 @@ const FullPageLayout = styled.div`
   i.fa {
     cursor: pointer;
   }
-`;  
+`;

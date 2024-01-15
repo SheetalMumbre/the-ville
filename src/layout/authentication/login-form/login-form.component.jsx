@@ -1,54 +1,92 @@
-import { Grid, TextField } from "@mui/material";
-import { Field, Form, Formik } from "formik";
-import { useMemo } from "react";
-import { LoginButton } from "./login-form.styles";
+import React, { useCallback, useMemo } from 'react';
+import { Formik, Form } from 'formik';
+import * as Validator from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { Grid, InputAdornment } from '@material-ui/core';
+import { FormTextField } from '../../../components/common/forms/form-text-field';
+import { FormPasswordField } from '../../../components/common/forms/form-password-field';
+import { FormError } from '../../../components/common/forms/form-error';
+import { LoginButton, ForgotPasswordLink, LoginIconStyle, Header, } from '../login-form/login-form.styles';
+import { resource } from '../../../components/string-resources/string-resources';
+import { authenticationResources } from '../logic/authentication.const';
+import { validateEmail } from '../../../components/common/forms/email-validation';
+import { login, openResetPassword } from '../logic/authentication.action';
+import { Person, Lock } from '@material-ui/icons';
 
 const LoginForm = () => {
-    // debugger;
+  const dispatch = useDispatch();
+  const isFetching = useSelector(state => state.authentication.loginFetching);
+  const error = useSelector(state => state.authentication.loginError);
 
-    const form = useMemo(() =>({
-        email:'',
-        password:''
-    }), []);
+  const form = useMemo(() => ({
+    email: '',
+    password: ''
+  }), []);
 
-    const handleSubmit = (values) => {
-        // alert('Login successful');
+  const formSchema = useMemo(() => Validator.object({
+    email: Validator.string().test(validateEmail).required(),
+    password: Validator.string().min(8).required()
+  }), []);
 
-        console.log('Form submitted with email value:', values.email);
-        console.log('Password value:', values.password);
-        window.alert(values.email + values.password);
-        window.location.href = '/';
-        // try{    
-        // }
-        // catch(error){
-        //     alert('There is some Error');
-        // }
-    };
-    return(
-        <div>
-            <Formik initialValues={form} onSubmit={handleSubmit}>
-            {() => (
-                <Form xs={12}>
-                   <Grid item xs={12}>
-                        <Field name="email" type="text" label='Email' as={TextField} style={fieldStyle}
-                        // onChange={(e) => console.log('Email Value:', e.target.value)}
-                        />
-                   </Grid>
-                   <Grid item xs={12}>
-                        <Field type="password" label="password" name="password" as={TextField}/>
-                   </Grid>
-                   <Grid item xs={12}>
-                        <LoginButton type="submit" className="primary">Submit</LoginButton>
-                   </Grid>
-                </Form>
-                 )}
-            </Formik>
-        </div>
-    )
+  const handleSubmit = useCallback(values => {
+    dispatch(login(values));
+  }, [dispatch]);
+
+  const handleGoToResetPassword = useCallback(() => {
+    dispatch(openResetPassword());
+  }, [dispatch]);
+
+  return (
+    <div>
+      <Header>{resource(authenticationResources.login.title)}</Header>
+      <Formik
+        initialValues={form}
+        validationSchema={formSchema}
+        onSubmit={handleSubmit}
+        validateOnChange={false}
+      >
+        <Form xs={12}>
+          <FormError error={error} />
+
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <FormTextField
+                name='email'
+                placeholder={resource(authenticationResources.login.email)}
+                startAdornment={
+                  <InputAdornment position='end'>
+                    <Person style={LoginIconStyle} />
+                  </InputAdornment>
+                }
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormPasswordField
+                name='password'
+                placeholder={resource(authenticationResources.login.password)}
+                startAdornment={
+                  <InputAdornment position='end'>
+                    <Lock style={LoginIconStyle} />
+                  </InputAdornment>
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <LoginButton type='submit' fetching={isFetching} fullWidth>
+                {resource(authenticationResources.login.submit)}
+              </LoginButton>
+            </Grid>
+            <Grid item xs={12}>
+              <ForgotPasswordLink fullWidth onClick={handleGoToResetPassword}>
+                {resource(authenticationResources.login.forgottenPassword)}
+              </ForgotPasswordLink>
+            </Grid>
+          </Grid>
+        </Form>
+      </Formik>
+    </div>
+  );
 };
 
 export default LoginForm;
-
-const fieldStyle = {
-    marginBottom: '10px', // Add spacing at the bottom of each field
-};

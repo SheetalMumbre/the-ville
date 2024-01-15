@@ -1,44 +1,95 @@
-import React from 'react';
+import React from "react";
+import { useEffect } from "react";
+import MenuItem from "./menu-item";
+import { menuList } from "../menu-list";
 import styled from "@emotion/styled";
-import MenuItem from './menu-item';
-import sidebarlogo from "../assets/images/logo-white.png";
 
-const Sidebar = () => {
-    return(
-        <SideBarContainer>
-            <div className="mb-4">
-                <p className="d-grid">
-                    <SidebarLogo src={sidebarlogo} alt="theVille"/>
-                    <span>Resort–Casino</span>
-                </p>
-            </div>
+export const SideMenuBar = ({ toggleSidebar }) => {
+  useEffect(() => {
+    let menuItems = document.querySelectorAll(".menu-item");
+    menuItems.forEach((el) => {
+      el.addEventListener("click", (e) => {
+        menuItems.forEach((el) => {
+          el.classList.remove("selected");
+          el.parentElement.classList.remove("active-menu-border");
+        });
+        removeActiveClassFromSubMenu();
+        el.parentElement.classList.toggle("active-menu-border");
+        el.classList.toggle("selected");
+        const next = el.nextElementSibling;
+        if (next !== null) {
+          next.classList.toggle("selected");
+        }
+      });
+    });
 
-            <Menu className="menu">
-                <ul>
-                    <MenuItem/>
-                </ul>
-            </Menu>
-            <div className="d-flex">
-                <SidebarFooterLine />
-                <SidebarCloseIcon>
-                <span >
-                    <h4>
-                    <i className="fa fa-lg fa-backward"></i>
-                    </h4>
-                </span>
-                </SidebarCloseIcon>
-            </div>
-        </SideBarContainer>
-    )
-}
+    let submenuItems = document.querySelectorAll(".submenu-item>a");
+    submenuItems.forEach((el) => {
+      el.addEventListener("click", (e) => {
+        submenuItems.forEach((el) => el.classList.remove("active-menu"));
+        el.classList.toggle("active-menu");
+      });
+    });
+  }, []);
 
-export default Sidebar;
+  const removeActiveClassFromSubMenu = () => {
+    document.querySelectorAll(".submenu").forEach((el) => {
+      el.classList.remove("selected");
+    });
+    document.querySelectorAll(".submenu-item>a").forEach((el) => {
+      el.classList.remove("active-menu");
+    });
+  };
 
+  return (
+    <SideBarContainer>
+      <div className="mb-4">
+        <p className="d-grid">
+          The Ville
+          <span>Resort-Casino</span>
+        </p>
+      </div>
+      <Menu className="menu">
+        <ul>
+          {menuList.map((menuItem, index) =>
+            menuItem.isMenu ? (
+              <MenuItem
+                key={index}
+                name={menuItem.name}
+                exact={menuItem.exact}
+                to={menuItem.path}
+                subMenus={menuItem.subMenus || []}
+                icon={menuItem.icon}
+              />
+            ) : null
+          )}
+        </ul>
+      </Menu>
+      <div className="d-flex">
+        <SidebarFooterLine />
+        <SidebarCloseIcon>
+          <span onClick={(event) => toggleSidebar(false)}>
+            <h4>
+              <i className="fa fa-lg fa-backward"></i>
+            </h4>
+          </span>
+        </SidebarCloseIcon>
+      </div>
+    </SideBarContainer>
+  );
+};
 
 const SideBarContainer = styled.div`
   .selected {
-    background: #e4450a36 !important;
-  } 
+    background: #0ae4ca36 !important;
+  }
+
+  .active-menu-border {
+    border-top: 0.09em solid
+      ${(props) => props.theme.palette.background.sideMenuSelectedBorder};
+    border-bottom: 0.09em solid
+      ${(props) => props.theme.palette.background.sideMenuSelectedBorder};
+  }
 `;
 
 const Menu = styled.div`
@@ -57,9 +108,9 @@ const Menu = styled.div`
   }
 
   & > ul > li > a {
-    font-size: 17px;
-    font-weight: 600;
-    padding: 7px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 20px;
   }
 
   & li {
@@ -69,12 +120,15 @@ const Menu = styled.div`
     padding-left: 0px;
   }
 
+  & li a:hover {
+    color: ${(props) => props.theme.palette.background.hover};
+  }
+
   & li a {
     color: #fff;
     text-decoration: none;
     padding: 0px 5px;
     display: block;
-    cursor:pointer;
   }
 `;
 
@@ -89,14 +143,10 @@ const SidebarFooterLine = styled.div`
   width: 67%;
   height: 2px;
   border-radius: 1px;
-
+  background: ${(props) => props.theme.palette.primary.dark};
   left: 0px;
   position: absolute;
   bottom: 30px;
 `;
 
-const SidebarLogo = styled.img`
-height: 60px;
-width: auto;
-margin: 25px auto 5px;
-`;
+export default SideMenuBar;
